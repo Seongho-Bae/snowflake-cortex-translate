@@ -63,11 +63,7 @@ def test_create_translation_returns_translation_payload() -> None:
     )
 
     assert response.status_code == 200
-    assert response.json() == {
-        "translated_text": "안녕하세요",
-        "connection_name": "dev",
-        "query_tag": "api-test-query-tag",
-    }
+    assert response.json() == {"translated_text": "안녕하세요"}
     assert service.requests == [
         TranslationRequest(text="Hello", source_language="en", target_language="ko")
     ]

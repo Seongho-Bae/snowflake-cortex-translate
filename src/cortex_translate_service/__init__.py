@@ -10,7 +10,6 @@ from cortex_translate_service.service import (
     TranslationGatewayError,
     TranslationService,
 )
-from cortex_translate_service.api import app, build_app
 
 __all__ = [
     "TranslationGateway",
@@ -19,6 +18,4 @@ __all__ = [
     "TranslationResult",
     "TranslationService",
     "TranslationValidationError",
-    "app",
-    "build_app",
 ]

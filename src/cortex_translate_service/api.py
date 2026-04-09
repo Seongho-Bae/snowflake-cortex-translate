@@ -1,6 +1,7 @@
 """FastAPI delivery layer for the Snowflake Cortex translation service."""
 
 from collections.abc import Callable
+from typing import Protocol
 
 from fastapi import Depends, FastAPI
 from fastapi.exceptions import RequestValidationError
@@ -10,11 +11,20 @@ from pydantic import BaseModel, ConfigDict
 from cortex_translate_service.cli import build_service_from_env
 from cortex_translate_service.domain import (
     TranslationRequest,
+    TranslationResult,
     TranslationValidationError,
 )
-from cortex_translate_service.service import TranslationGatewayError, TranslationService
+from cortex_translate_service.service import TranslationGatewayError
 
-ServiceFactory = Callable[[], TranslationService]
+
+class SupportsTranslate(Protocol):
+    """Protocol for any component that can process translation requests."""
+
+    def translate(self, request: TranslationRequest) -> TranslationResult:
+        """Translate the request and return a result-like object."""
+
+
+ServiceFactory = Callable[[], SupportsTranslate]
 
 
 class TranslationRequestBody(BaseModel):
@@ -31,8 +41,6 @@ class TranslationResponseBody(BaseModel):
     """API response model for successful translations."""
 
     translated_text: str
-    connection_name: str
-    query_tag: str
 
 
 class ErrorResponse(BaseModel):
@@ -53,7 +61,7 @@ def build_app(service_factory: ServiceFactory = build_service_from_env) -> FastA
         ),
     )
 
-    def get_service() -> TranslationService:
+    def get_service() -> SupportsTranslate:
         """Provide the translation service dependency."""
         return service_factory()
 
@@ -116,7 +124,7 @@ def build_app(service_factory: ServiceFactory = build_service_from_env) -> FastA
     )
     def create_translation(
         payload: TranslationRequestBody,
-        service: TranslationService = Depends(get_service),
+        service: SupportsTranslate = Depends(get_service),
     ) -> TranslationResponseBody:
         """Translate the provided text through Snowflake Cortex."""
         result = service.translate(
@@ -128,8 +136,6 @@ def build_app(service_factory: ServiceFactory = build_service_from_env) -> FastA
         )
         return TranslationResponseBody(
             translated_text=result.translated_text,
-            connection_name=result.connection_name,
-            query_tag=result.query_tag,
         )
 
     return app
@@ -140,6 +146,7 @@ app = build_app()
 
 __all__ = [
     "ErrorResponse",
+    "SupportsTranslate",
     "TranslationRequestBody",
     "TranslationResponseBody",
     "app",
