@@ -1,0 +1,49 @@
+[project]
+name = "cortex-translate-service"
+version = "0.1.0"
+description = "Snowflake Cortex AI translation service using a named dev profile."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "snowflake-connector-python>=3.17.3,<4",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3.5,<9",
+  "pytest-cov>=6.1.1,<7",
+]
+
+[project.scripts]
+cortex-translate = "cortex_translate_service.cli:run"
+
+[build-system]
+requires = ["hatchling>=1.27.0,<2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cortex_translate_service"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+  "-ra",
+  "--strict-markers",
+]
+pythonpath = ["src"]
+
+[tool.coverage.run]
+branch = true
+source = ["src/cortex_translate_service"]
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src", "tests"]
+
+[[tool.mypy.overrides]]
+module = ["pytest", "snowflake", "snowflake.*"]
+ignore_missing_imports = true

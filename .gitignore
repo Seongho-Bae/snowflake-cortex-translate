@@ -1,0 +1,13 @@
+.venv/
+.pytest_cache/
+.worktrees/
+.coverage
+coverage.xml
+htmlcov/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.ruff_cache/
+.snowflake/
+registered_agents.json
+task_agent_mapping.json

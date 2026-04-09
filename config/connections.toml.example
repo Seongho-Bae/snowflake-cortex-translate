@@ -1,0 +1,11 @@
+[dev]
+account = "your-organization-your-account"
+user = "your_user"
+authenticator = "externalbrowser"
+warehouse = "DEV_XS_WH"
+database = "DEV_DB"
+schema = "PUBLIC"
+role = "CORTEX_DEV_ROLE"
+client_session_keep_alive = false
+login_timeout = 30
+network_timeout = 120
