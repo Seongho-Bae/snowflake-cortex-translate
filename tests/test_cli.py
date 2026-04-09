@@ -1,7 +1,7 @@
 """Tests for the CLI entry point."""
 
-import cortex_translate_service.bootstrap as bootstrap
 from cortex_translate_service import cli
+from cortex_translate_service.bootstrap import build_service_from_env
 from cortex_translate_service.domain import TranslationRequest, TranslationResult
 from cortex_translate_service.service import TranslationGatewayError
 
@@ -63,9 +63,12 @@ def test_run_prints_gateway_errors_to_stderr(monkeypatch, capsys) -> None:
 def test_build_service_from_env_wraps_the_gateway(monkeypatch) -> None:
     """The CLI service builder wraps the environment-backed gateway."""
     gateway = object()
-    monkeypatch.setattr(bootstrap, "build_gateway_from_env", lambda: gateway)
+    monkeypatch.setattr(
+        "cortex_translate_service.bootstrap.build_gateway_from_env",
+        lambda: gateway,
+    )
 
-    service = cli.build_service_from_env()
+    service = build_service_from_env()
 
     assert service.gateway is gateway
 
