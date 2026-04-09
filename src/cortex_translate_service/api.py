@@ -8,7 +8,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict
 
-from cortex_translate_service.cli import build_service_from_env
+from cortex_translate_service.bootstrap import build_service_from_env
 from cortex_translate_service.domain import (
     TranslationRequest,
     TranslationResult,
