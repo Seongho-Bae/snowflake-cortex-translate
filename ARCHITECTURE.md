@@ -5,9 +5,9 @@ Last updated: 2026-04-08
 ## Overview
 
 This project provides a minimal translation service for Snowflake Cortex.
-A local CLI receives translation input, validates it in a small domain
-layer, and delegates execution to a Snowflake connector adapter that
-calls `AI_TRANSLATE` through a named connection profile.
+A local CLI and a small REST API receive translation input, validate it in
+a small domain layer, and delegate execution to a Snowflake connector
+adapter that calls `AI_TRANSLATE` through a named connection profile.
 
 ## Components
 
@@ -35,14 +35,21 @@ calls `AI_TRANSLATE` through a named connection profile.
 - builds the environment-backed service
 - prints translated text or a safe failure message
 
+### API Delivery (`src/cortex_translate_service/api.py`)
+
+- exposes `GET /healthz`
+- exposes `POST /api/v1/translations`
+- maps request, domain, and gateway failures to controlled JSON responses
+- publishes OpenAPI for the REST interface
+
 ## Runtime flow
 
 1. The operator activates a local Snowflake profile under `SNOWFLAKE_HOME`.
-2. The CLI builds a `TranslationRequest`.
+2. The CLI or REST API builds a `TranslationRequest`.
 3. `TranslationService` delegates to `SnowflakeTranslationGateway`.
 4. The gateway opens the named connection and executes `AI_TRANSLATE`.
-5. The translated value is returned as `TranslationResult` and printed
-   to stdout.
+5. The translated value is returned as `TranslationResult` and surfaced
+   either as CLI stdout or JSON API output.
 
 ## Operational artifacts
 

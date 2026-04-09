@@ -1,13 +1,13 @@
 # Cortex Translate Service
 
-Local Python translation service that uses a Snowflake `dev` profile
-and Snowflake Cortex `AI_TRANSLATE`.
+Local Python translation service and REST API that use a Snowflake `dev`
+profile and Snowflake Cortex `AI_TRANSLATE`.
 
 ## What this project does
 
 - activates a named Snowflake connection profile (default: `dev`)
 - sends translation requests to Snowflake Cortex `AI_TRANSLATE`
-- exposes the flow through a small CLI service
+- exposes the flow through both a CLI and a RESTful API
 - documents the grants and SQL verification needed for live Snowflake use
 
 ## Project layout
@@ -25,6 +25,7 @@ and Snowflake Cortex `AI_TRANSLATE`.
 │   └── verify.sql
 ├── src/cortex_translate_service/
 │   ├── __init__.py
+│   ├── api.py
 │   ├── cli.py
 │   ├── domain.py
 │   ├── service.py
@@ -88,6 +89,38 @@ SNOWFLAKE_QUERY_TAG=cortex-translate-demo \
 uv run cortex-translate --text "Good morning" --source en --target de
 ```
 
+## Run the REST API
+
+Start the FastAPI server locally:
+
+```bash
+uv run uvicorn cortex_translate_service.api:app --host 127.0.0.1 --port 8000
+```
+
+Check health:
+
+```bash
+curl http://127.0.0.1:8000/healthz
+```
+
+Translate text through the REST endpoint:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/translations \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Hello world",
+    "source_language": "en",
+    "target_language": "ko"
+  }'
+```
+
+OpenAPI is available at:
+
+```text
+http://127.0.0.1:8000/openapi.json
+```
+
 ## Run tests
 
 ```bash
@@ -114,4 +147,5 @@ uv run pytest --cov=src/cortex_translate_service --cov-report=term-missing
 - Keep credentials outside the repository.
 - Prefer `externalbrowser`, key-pair auth, OAuth, PAT, or workload
   identity over plaintext passwords.
-- The CLI prints only translated output or high-level error messages.
+- The CLI and REST API return only translated output or high-level error
+  messages.
