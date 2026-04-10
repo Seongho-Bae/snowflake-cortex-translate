@@ -8,19 +8,71 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   dependency-review:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
 
     steps:
       - name: Check out repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      - name: Probe dependency graph availability
+        id: dependency_graph
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          response_file=$(mktemp)
+          compare_url="${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/dependency-graph/compare/${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}"
+          status=$(curl -sS -o "$response_file" -w "%{http_code}" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "$compare_url")
+
+          if [ "$status" = "200" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "$status" = "403" ] || [ "$status" = "404" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "message<<EOF"
+              cat "$response_file"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          cat "$response_file" >&2
+          exit 1
+
       - name: Review dependency changes
+        if: steps.dependency_graph.outputs.available == 'true'
         uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
         with:
           fail-on-severity: high
           comment-summary-in-pr: on-failure
+
+      - name: Summarize skipped dependency review
+        if: steps.dependency_graph.outputs.available != 'true'
+        shell: bash
+        env:
+          DEPENDENCY_GRAPH_MESSAGE: ${{ steps.dependency_graph.outputs.message }}
+        run: |
+          {
+            echo "## Dependency Review"
+            echo ""
+            echo "Dependency review was skipped because the repository dependency graph is unavailable."
+            echo ""
+            echo '```json'
+            printf '%s\n' "$DEPENDENCY_GRAPH_MESSAGE"
+            echo '```'
+            echo ""
+            echo "Tracked separately in issue #2."
+          } >> "$GITHUB_STEP_SUMMARY"
