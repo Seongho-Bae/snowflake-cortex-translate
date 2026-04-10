@@ -16,7 +16,7 @@ dev = [
   "interrogate>=1.7.0,<2",
   "mypy>=1.20.0",
   "pytest>=8.3.5,<10",
-  "pytest-cov>=6.1.1,<7",
+  "pytest-cov>=6.1.1,<8",
 ]
 
 [tool.interrogate]
