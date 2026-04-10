@@ -8,6 +8,7 @@ class RecordingGateway(TranslationGateway):
     """Test double that records incoming requests."""
 
     def __init__(self) -> None:
+        """Initialize the recorded request list for service assertions."""
         self.requests: list[TranslationRequest] = []
 
     def translate(self, request: TranslationRequest) -> TranslationResult:

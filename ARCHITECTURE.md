@@ -1,6 +1,6 @@
 # Architecture
 
-Last updated: 2026-04-08
+Last updated: 2026-04-10
 
 ## Overview
 
@@ -22,6 +22,11 @@ adapter that calls `AI_TRANSLATE` through a named connection profile.
 - `TranslationGateway`: infrastructure boundary
 - `TranslationService`: orchestrates translation requests
 - `TranslationGatewayError`: gateway/runtime exception
+
+### Bootstrap (`src/cortex_translate_service/bootstrap.py`)
+
+- builds the environment-backed `TranslationService` once
+- shares identical wiring between the CLI and FastAPI delivery surfaces
 
 ### Infrastructure (`src/cortex_translate_service/snowflake_gateway.py`)
 
@@ -57,3 +62,7 @@ adapter that calls `AI_TRANSLATE` through a named connection profile.
 - `sql/setup.sql`: required grants and warehouse/database usage setup
 - `sql/verify.sql`: direct SQL verification for the Cortex translation path
 - `docs/plans/`: design and implementation records
+- `docs/release-publishing.md`: public-repo, Pages, and GHCR release checklist
+- `site/`: static Korean service page published through GitHub Pages
+- `.github/workflows/`: CI, CodeQL, dependency review, Scorecard, Pages,
+  and release automation

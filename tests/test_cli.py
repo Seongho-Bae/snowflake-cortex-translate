@@ -12,6 +12,7 @@ class FakeService:
     def __init__(
         self, *, result: TranslationResult | None = None, error: Exception | None = None
     ) -> None:
+        """Store canned CLI outcomes and capture translated requests."""
         self.result = result
         self.error = error
         self.requests: list[TranslationRequest] = []

@@ -1,6 +1,6 @@
 [project]
 name = "cortex-translate-service"
-version = "0.1.0"
+version = "0.1.1"
 description = "Snowflake Cortex AI translation service using a named dev profile."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -13,10 +13,15 @@ dependencies = [
 [dependency-groups]
 dev = [
   "httpx>=0.28.1",
+  "interrogate>=1.7.0,<2",
   "mypy>=1.20.0",
   "pytest>=8.3.5,<9",
   "pytest-cov>=6.1.1,<7",
 ]
+
+[tool.interrogate]
+fail-under = 100
+exclude = ["research_repos"]
 
 [project.scripts]
 cortex-translate = "cortex_translate_service.cli:run"

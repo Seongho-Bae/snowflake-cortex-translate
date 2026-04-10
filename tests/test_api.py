@@ -15,6 +15,7 @@ class FakeService:
         result: TranslationResult | None = None,
         error: Exception | None = None,
     ) -> None:
+        """Store canned API outcomes and record received requests."""
         self.result = result
         self.error = error
         self.requests: list[TranslationRequest] = []
@@ -51,7 +52,9 @@ def test_create_translation_returns_translation_payload() -> None:
             query_tag="api-test-query-tag",
         )
     )
-    client = TestClient(build_app(service_factory=lambda: service))
+    client = TestClient(
+        build_app(service_factory=lambda: service, required_api_key="test-api-key")
+    )
 
     response = client.post(
         "/api/v1/translations",
@@ -60,6 +63,7 @@ def test_create_translation_returns_translation_payload() -> None:
             "source_language": "en",
             "target_language": "ko",
         },
+        headers={"x-api-key": "test-api-key"},
     )
 
     assert response.status_code == 200
@@ -73,7 +77,11 @@ def test_create_translation_returns_request_validation_error() -> None:
     """Missing required request fields return a structured 422 response."""
     from cortex_translate_service.api import build_app
 
-    client = TestClient(build_app(service_factory=lambda: FakeService()))
+    client = TestClient(
+        build_app(
+            service_factory=lambda: FakeService(), required_api_key="test-api-key"
+        )
+    )
 
     response = client.post(
         "/api/v1/translations",
@@ -81,6 +89,7 @@ def test_create_translation_returns_request_validation_error() -> None:
             "text": "Hello",
             "source_language": "en",
         },
+        headers={"x-api-key": "test-api-key"},
     )
 
     assert response.status_code == 422
@@ -92,7 +101,11 @@ def test_create_translation_returns_domain_validation_error() -> None:
     """Whitespace-only text is rejected with a controlled validation response."""
     from cortex_translate_service.api import build_app
 
-    client = TestClient(build_app(service_factory=lambda: FakeService()))
+    client = TestClient(
+        build_app(
+            service_factory=lambda: FakeService(), required_api_key="test-api-key"
+        )
+    )
 
     response = client.post(
         "/api/v1/translations",
@@ -101,6 +114,7 @@ def test_create_translation_returns_domain_validation_error() -> None:
             "source_language": "en",
             "target_language": "ko",
         },
+        headers={"x-api-key": "test-api-key"},
     )
 
     assert response.status_code == 422
@@ -111,11 +125,84 @@ def test_create_translation_returns_domain_validation_error() -> None:
 
 
 def test_create_translation_returns_gateway_error() -> None:
-    """Snowflake gateway failures are mapped to a 502 JSON response."""
+    """Snowflake gateway failures are mapped to a safe 502 JSON response."""
     from cortex_translate_service.api import build_app
 
-    service = FakeService(error=TranslationGatewayError("profile missing"))
-    client = TestClient(build_app(service_factory=lambda: service))
+    service = FakeService(
+        error=TranslationGatewayError(
+            "Snowflake translation request failed: token expired for account demo"
+        )
+    )
+    client = TestClient(
+        build_app(service_factory=lambda: service, required_api_key="test-api-key")
+    )
+
+    response = client.post(
+        "/api/v1/translations",
+        json={
+            "text": "Hello",
+            "source_language": "en",
+            "target_language": "ko",
+        },
+        headers={"x-api-key": "test-api-key"},
+    )
+
+    assert response.status_code == 502
+    assert response.json() == {
+        "code": "translation_gateway_error",
+        "message": "Translation backend unavailable",
+    }
+
+
+def test_openapi_exposes_translation_endpoint() -> None:
+    """The generated OpenAPI document includes the translation route."""
+    from cortex_translate_service.api import build_app
+
+    client = TestClient(
+        build_app(
+            service_factory=lambda: FakeService(), required_api_key="test-api-key"
+        )
+    )
+
+    response = client.get("/openapi.json")
+
+    assert response.status_code == 200
+    assert "/api/v1/translations" in response.json()["paths"]
+
+
+def test_openapi_marks_translation_endpoint_with_required_api_key_security() -> None:
+    """The generated OpenAPI contract advertises API-key auth as required."""
+    from cortex_translate_service.api import build_app
+
+    client = TestClient(
+        build_app(
+            service_factory=lambda: FakeService(), required_api_key="test-api-key"
+        )
+    )
+
+    response = client.get("/openapi.json")
+
+    assert response.status_code == 200
+    openapi = response.json()
+    operation = openapi["paths"]["/api/v1/translations"]["post"]
+
+    assert operation["security"] == [{"APIKeyHeader": []}]
+    assert openapi["components"]["securitySchemes"]["APIKeyHeader"] == {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+    }
+
+
+def test_create_translation_requires_api_key() -> None:
+    """Missing API credentials are rejected before translation execution."""
+    from cortex_translate_service.api import build_app
+
+    client = TestClient(
+        build_app(
+            service_factory=lambda: FakeService(), required_api_key="test-api-key"
+        )
+    )
 
     response = client.post(
         "/api/v1/translations",
@@ -126,20 +213,33 @@ def test_create_translation_returns_gateway_error() -> None:
         },
     )
 
-    assert response.status_code == 502
+    assert response.status_code == 401
     assert response.json() == {
-        "code": "translation_gateway_error",
-        "message": "profile missing",
+        "code": "authorization_error",
+        "message": "Invalid API key",
     }
 
 
-def test_openapi_exposes_translation_endpoint() -> None:
-    """The generated OpenAPI document includes the translation route."""
+def test_create_translation_rejects_requests_when_api_key_not_configured() -> None:
+    """The translation endpoint stays unavailable until an API key is configured."""
     from cortex_translate_service.api import build_app
 
-    client = TestClient(build_app(service_factory=lambda: FakeService()))
+    client = TestClient(
+        build_app(service_factory=lambda: FakeService(), required_api_key="")
+    )
 
-    response = client.get("/openapi.json")
+    response = client.post(
+        "/api/v1/translations",
+        json={
+            "text": "Hello",
+            "source_language": "en",
+            "target_language": "ko",
+        },
+        headers={"x-api-key": "any-value"},
+    )
 
-    assert response.status_code == 200
-    assert "/api/v1/translations" in response.json()["paths"]
+    assert response.status_code == 503
+    assert response.json() == {
+        "code": "api_not_configured",
+        "message": "Translation API unavailable",
+    }
