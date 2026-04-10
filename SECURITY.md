@@ -12,10 +12,11 @@ The repository is currently maintained on the latest published `0.1.x` line.
 ## Reporting a Vulnerability
 
 - **Do not** open public GitHub issues for suspected security vulnerabilities.
-- Prefer a **private GitHub security advisory** for this repository.
+- Prefer a **private GitHub security advisory** for this repository at
+  <https://github.com/Seongho-Bae/snowflake-cortex-translate/security/advisories/new>.
 - If private advisories are not available yet, contact the maintainer through a
-  private channel and include only the minimum reproduction details needed to
-  triage the issue.
+  private channel such as <mailto:me@seonghobae.me> and include only the
+  minimum reproduction details needed to triage the issue.
 
 Please include:
 
