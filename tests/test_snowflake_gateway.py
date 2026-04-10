@@ -14,6 +14,7 @@ class FakeCursor:
     """Cursor test double for Snowflake query execution."""
 
     def __init__(self, row: tuple[object, ...] | None) -> None:
+        """Seed the cursor with a single fetchable row payload."""
         self.row = row
         self.calls: list[tuple[str, dict[str, str]]] = []
 
@@ -39,6 +40,7 @@ class FakeConnection:
     """Connection test double for Snowflake connector usage."""
 
     def __init__(self, cursor: FakeCursor) -> None:
+        """Attach the fake cursor returned during query execution."""
         self._cursor = cursor
 
     def __enter__(self) -> "FakeConnection":
@@ -63,6 +65,7 @@ def test_snowflake_gateway_executes_ai_translate_query() -> None:
     captured: dict[str, object] = {}
 
     def connect(**kwargs):
+        """Capture connect kwargs and return the fake connection."""
         captured.update(kwargs)
         return FakeConnection(cursor)
 

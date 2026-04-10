@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cortex Translate Service | Snowflake 번역 서비스</title>
+    <meta
+      name="description"
+      content="Snowflake Cortex AI_TRANSLATE 기반 CLI 및 REST API 서비스의 설정, 실행, 배포 흐름을 한 페이지에서 확인합니다."
+    >
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">본문으로 바로가기</a>
+
+    <header class="site-header" aria-label="사이트 상단">
+      <div class="header-inner">
+        <div class="brand-block">
+          <p class="eyebrow">Snowflake Cortex</p>
+          <a class="brand" href="#top">Cortex Translate Service</a>
+          <p class="tagline">
+            Snowflake Cortex <code>AI_TRANSLATE</code> 기반 번역 서비스 핵심 흐름
+          </p>
+        </div>
+
+        <nav class="desktop-nav" aria-label="주요 섹션">
+          <ul>
+            <li><a href="#overview">개요</a></li>
+            <li><a href="#profile">Snowflake 프로필</a></li>
+            <li><a href="#cli">CLI</a></li>
+            <li><a href="#api">REST API</a></li>
+            <li><a href="#docker">Docker</a></li>
+            <li><a href="#contribution">기여·릴리스</a></li>
+            <li><a href="#security">보안</a></li>
+          </ul>
+        </nav>
+
+        <details class="mobile-nav">
+          <summary>메뉴</summary>
+          <nav aria-label="모바일 주요 섹션">
+            <ul>
+              <li><a href="#overview">개요</a></li>
+              <li><a href="#profile">Snowflake 프로필</a></li>
+              <li><a href="#cli">CLI</a></li>
+              <li><a href="#api">REST API</a></li>
+              <li><a href="#docker">Docker</a></li>
+              <li><a href="#contribution">기여·릴리스</a></li>
+              <li><a href="#security">보안</a></li>
+            </ul>
+          </nav>
+        </details>
+      </div>
+    </header>
+
+    <main id="main-content" class="page" tabindex="-1">
+      <section class="hero panel" id="top" aria-labelledby="hero-title">
+        <div>
+          <p class="section-label">빠른 시작</p>
+          <h1 id="hero-title">Snowflake Cortex 번역 서비스</h1>
+          <p class="lead">
+            이 저장소는 로컬 CLI와 FastAPI REST API를 통해 Snowflake Cortex
+            번역 기능을 제공합니다. 설정, 실행, 배포 흐름을 한 번에 정리해
+            팀이 바로 적용할 수 있는 운영 기준과 예시를 제공합니다.
+          </p>
+        </div>
+
+        <div class="hero-grid" aria-label="핵심 요약">
+          <article class="metric-card">
+            <h2>기본 연결</h2>
+            <p><code>dev</code> Snowflake 프로필</p>
+          </article>
+          <article class="metric-card">
+            <h2>주요 진입점</h2>
+            <p>CLI + REST API + Docker</p>
+          </article>
+          <article class="metric-card">
+            <h2>운영 기준</h2>
+            <p>로컬 실행 + 컨테이너 배포</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="overview" aria-labelledby="overview-title">
+        <div class="section-heading">
+          <p class="section-label">01</p>
+          <h2 id="overview-title">프로젝트 개요</h2>
+        </div>
+
+        <div class="content-grid two-column">
+          <article>
+            <h3>무엇을 제공하나요?</h3>
+            <ul class="check-list">
+              <li>명명된 Snowflake 연결 프로필 활성화</li>
+              <li><code>AI_TRANSLATE</code> 호출을 통한 번역 처리</li>
+              <li>CLI와 REST API 양쪽 인터페이스 제공</li>
+              <li>운영·배포·보안 가이드를 저장소 문서로 관리</li>
+            </ul>
+          </article>
+
+          <article>
+            <h3>구성 요소</h3>
+            <dl class="info-list">
+              <div>
+                <dt>도메인</dt>
+                <dd>번역 요청/응답 모델과 입력 검증</dd>
+              </div>
+              <div>
+                <dt>서비스 계층</dt>
+                <dd>게이트웨이 호출과 오류 매핑</dd>
+              </div>
+              <div>
+                <dt>전달 계층</dt>
+                <dd>CLI, FastAPI API, Docker 런타임</dd>
+              </div>
+            </dl>
+          </article>
+        </div>
+
+        <article class="callout" aria-labelledby="runtime-flow-title">
+          <h3 id="runtime-flow-title">런타임 흐름</h3>
+          <ol>
+            <li>운영자가 <code>SNOWFLAKE_HOME</code> 아래 로컬 프로필을 준비합니다.</li>
+            <li>CLI 또는 REST API가 번역 입력을 수집하고 검증합니다.</li>
+            <li>서비스 계층이 Snowflake 게이트웨이를 통해 <code>AI_TRANSLATE</code>를 실행합니다.</li>
+            <li>결과는 표준 출력 또는 JSON 응답으로 반환됩니다.</li>
+          </ol>
+        </article>
+      </section>
+
+      <section class="panel" id="profile" aria-labelledby="profile-title">
+        <div class="section-heading">
+          <p class="section-label">02</p>
+          <h2 id="profile-title">Snowflake 프로필 설정</h2>
+        </div>
+
+        <div class="content-grid two-column">
+          <article>
+            <h3>사전 조건</h3>
+            <ul>
+              <li>Python 3.12+</li>
+              <li><code>uv</code></li>
+              <li><code>SNOWFLAKE.CORTEX_USER</code> 권한이 있는 역할</li>
+              <li>접근 가능한 warehouse / database / schema</li>
+            </ul>
+          </article>
+
+          <article>
+            <h3>인증 기본값</h3>
+            <p>
+              로컬 개발에서는 저장소 안에 비밀번호를 남기지 않기 위해
+              <code>externalbrowser</code> 사용이 가장 안전한 기본값입니다.
+            </p>
+          </article>
+        </div>
+
+        <article>
+          <h3>설정 절차</h3>
+          <pre><code>mkdir -p .snowflake
+cp config/connections.toml.example .snowflake/connections.toml
+
+export SNOWFLAKE_HOME="$PWD/.snowflake"
+export SNOWFLAKE_DEFAULT_CONNECTION_NAME=dev
+export SNOWFLAKE_CONNECTION_NAME=dev</code></pre>
+          <p>
+            <code>.snowflake/connections.toml</code>의 placeholder 값을 실제 계정,
+            warehouse, database, schema 정보로 교체한 뒤 사용합니다.
+          </p>
+        </article>
+
+        <article class="callout warning" aria-labelledby="verification-title">
+          <h3 id="verification-title">실환경 검증</h3>
+          <p>
+            권한이 준비되면 <code>sql/setup.sql</code>과 <code>sql/verify.sql</code>을
+            사용해 Snowflake 쪽 권한 및 함수 호출 경로를 확인하세요.
+          </p>
+        </article>
+      </section>
+
+      <section class="panel" id="cli" aria-labelledby="cli-title">
+        <div class="section-heading">
+          <p class="section-label">03</p>
+          <h2 id="cli-title">CLI 사용법</h2>
+        </div>
+
+        <article>
+          <h3>의존성 설치</h3>
+          <pre><code>uv sync --dev</code></pre>
+        </article>
+
+        <div class="content-grid code-grid">
+          <article>
+            <h3>기본 번역</h3>
+            <pre><code>uv run cortex-translate \
+  --text "Hello world" \
+  --source en \
+  --target ko</code></pre>
+          </article>
+
+          <article>
+            <h3>원문 언어 자동 감지</h3>
+            <pre><code>uv run cortex-translate \
+  --text "Voy a likear tus fotos en Insta." \
+  --target en</code></pre>
+          </article>
+
+          <article>
+            <h3>추적용 Query Tag 지정</h3>
+            <pre><code>SNOWFLAKE_QUERY_TAG=cortex-translate-demo \
+uv run cortex-translate \
+  --text "Good morning" \
+  --source en \
+  --target de</code></pre>
+          </article>
+        </div>
+
+        <article>
+          <h3>CLI 사용 팁</h3>
+          <ul>
+            <li>번역 결과는 표준 출력으로 반환됩니다.</li>
+            <li>실패 시에는 고수준 오류만 노출되며 내부 비밀값은 반환하지 않습니다.</li>
+            <li>운영 추적이 필요하면 Query Tag를 함께 남기세요.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="panel" id="api" aria-labelledby="api-title">
+        <div class="section-heading">
+          <p class="section-label">04</p>
+          <h2 id="api-title">REST API 사용법</h2>
+        </div>
+
+        <article>
+          <h3>로컬 서버 실행</h3>
+          <pre><code>export TRANSLATION_API_KEY=change-me-before-exposing-the-api
+uv run uvicorn cortex_translate_service.api:app \
+  --host 127.0.0.1 \
+  --port 8000</code></pre>
+        </article>
+
+        <div class="table-wrap" role="region" aria-labelledby="api-table-title">
+          <table>
+            <caption id="api-table-title">주요 엔드포인트</caption>
+            <thead>
+              <tr>
+                <th scope="col">메서드</th>
+                <th scope="col">경로</th>
+                <th scope="col">설명</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="code-cell">GET</td>
+                <td class="code-cell">/healthz</td>
+                <td>애플리케이션 헬스 체크</td>
+              </tr>
+              <tr>
+                <td class="code-cell">POST</td>
+                <td class="code-cell">/api/v1/translations</td>
+                <td>번역 요청 처리</td>
+              </tr>
+              <tr>
+                <td class="code-cell">GET</td>
+                <td class="code-cell">/openapi.json</td>
+                <td>OpenAPI 스키마 확인</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="content-grid code-grid">
+          <article>
+            <h3>헬스 체크</h3>
+            <pre><code>curl http://127.0.0.1:8000/healthz</code></pre>
+          </article>
+
+          <article>
+            <h3>번역 요청</h3>
+            <pre><code>curl -X POST http://127.0.0.1:8000/api/v1/translations \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $TRANSLATION_API_KEY" \
+  -d '{
+    "text": "Hello world",
+    "source_language": "en",
+    "target_language": "ko"
+  }'</code></pre>
+          </article>
+        </div>
+
+        <article class="callout">
+          <h3>운영 메모</h3>
+          <p>
+            API는 요청/도메인/게이트웨이 오류를 제어된 JSON 응답으로 매핑합니다.
+            상세 내부 정보나 비밀값을 응답에 그대로 노출하지 않도록 설계되어 있습니다.
+          </p>
+          <p>
+            <code>TRANSLATION_API_KEY</code>가 설정되지 않으면 번역 엔드포인트는
+            503 응답으로 비활성화됩니다. 공개 배포 시에는 추가적인 네트워크 제어와
+            rate limiting을 함께 두세요.
+          </p>
+        </article>
+      </section>
+
+      <section class="panel" id="docker" aria-labelledby="docker-title">
+        <div class="section-heading">
+          <p class="section-label">05</p>
+          <h2 id="docker-title">Docker 사용법</h2>
+        </div>
+
+        <div class="content-grid two-column">
+          <article>
+            <h3>이미지 빌드</h3>
+            <pre><code>docker build -t cortex-translate-service:local .</code></pre>
+          </article>
+
+          <article>
+            <h3>컨테이너 실행</h3>
+            <pre><code>docker run --rm -p 8000:8000 \
+  -v "$PWD/.snowflake:/run/secrets/snowflake:ro" \
+  -e SNOWFLAKE_HOME=/run/secrets/snowflake \
+  -e SNOWFLAKE_DEFAULT_CONNECTION_NAME=dev \
+  -e SNOWFLAKE_CONNECTION_NAME=dev \
+  -e TRANSLATION_API_KEY="$TRANSLATION_API_KEY" \
+  cortex-translate-service:local</code></pre>
+          </article>
+        </div>
+
+        <article>
+          <h3>주의 사항</h3>
+          <ul>
+            <li>Snowflake 연결 정보는 읽기 전용 마운트 또는 workload identity로 주입합니다.</li>
+            <li>자격 증명을 이미지 안에 bake-in 하지 않습니다.</li>
+            <li>릴리스 워크플로는 <code>linux/amd64</code>, <code>linux/arm64</code> 이미지를 대상으로 합니다.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="panel" id="contribution" aria-labelledby="contribution-title">
+        <div class="section-heading">
+          <p class="section-label">06</p>
+          <h2 id="contribution-title">기여 · Git Flow · 릴리스 흐름</h2>
+        </div>
+
+        <div class="content-grid two-column">
+          <article>
+            <h3>브랜치 운영 원칙</h3>
+            <ul>
+              <li><code>develop</code>에서 통합하고 <code>main</code>에서 릴리스를 관리합니다.</li>
+              <li>짧게 유지되는 토픽 브랜치 사용: <code>feature/*</code>, <code>release/*</code>, <code>hotfix/*</code>, <code>docs/*</code></li>
+              <li>보호 브랜치에는 직접 push하지 않고 Pull Request를 통해 반영</li>
+              <li>운영 영향이 있으면 PR 설명과 문서에도 함께 남김</li>
+            </ul>
+          </article>
+
+          <article>
+            <h3>권장 로컬 확인</h3>
+           <pre><code>uv run pytest --cov=src/cortex_translate_service --cov-report=term-missing
+uv run mypy src tests
+uv run interrogate src tests
+docker build -t cortex-translate-service:local .</code></pre>
+          </article>
+        </div>
+
+        <article>
+          <h3>커밋/릴리스 규칙</h3>
+          <ul>
+            <li>Conventional Commit 접두사 권장: <code>feat:</code>, <code>fix:</code>, <code>docs:</code>, <code>ci:</code>, <code>security:</code></li>
+            <li><code>CHANGELOG.md</code>는 Keep a Changelog 형식 유지</li>
+            <li><code>main</code>에서 검증된 커밋에 시맨틱 태그(예: <code>v0.1.1</code>)를 push하면 GHCR 릴리스 워크플로가 동작</li>
+            <li>웹 요약 페이지와 저장소 문서를 함께 최신 상태로 유지합니다.</li>
+          </ul>
+        </article>
+
+        <article class="callout">
+          <h3>저장소 거버넌스</h3>
+          <p>
+            보호 브랜치, CodeQL, dependency review, OSSF Scorecard, CI coverage,
+            GHCR 릴리스가 저장소 운영 기본선입니다.
+          </p>
+        </article>
+      </section>
+
+      <section class="panel" id="security" aria-labelledby="security-title">
+        <div class="section-heading">
+          <p class="section-label">07</p>
+          <h2 id="security-title">보안 유의사항</h2>
+        </div>
+
+        <div class="content-grid two-column">
+          <article>
+            <h3>비밀정보 관리</h3>
+            <ul>
+              <li><code>.snowflake/</code>, 토큰, 로컬 환경 파일은 커밋하지 않습니다.</li>
+              <li>평문 비밀번호보다 <code>externalbrowser</code>, OAuth, PAT, 키 페어, workload identity를 우선합니다.</li>
+              <li>API 오류 응답에 환경별 내부 정보를 담지 않습니다.</li>
+              <li>REST API는 <code>x-api-key</code> 인증과 요청당 5,000자 제한을 기본선으로 둡니다.</li>
+            </ul>
+          </article>
+
+          <article>
+            <h3>취약점 제보</h3>
+            <ul>
+              <li>공개 GitHub Issue에 보안 취약점을 올리지 않습니다.</li>
+              <li>가능하면 private GitHub security advisory를 사용합니다.</li>
+              <li>영향 버전, 재현 단계, 완화 방향만 최소한으로 공유합니다.</li>
+            </ul>
+          </article>
+        </div>
+
+        <article class="callout warning">
+          <h3>응답 목표</h3>
+          <p>
+            보안 정책상 최초 확인 목표는 영업일 기준 3일, 1차 triage 목표는 7일입니다.
+          </p>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <p class="footer-title">Cortex Translate Service</p>
+        <p class="footer-copy">
+          설정, 실행, 배포, 보안 흐름을 한 번에 확인할 수 있도록 핵심 운영
+          정보를 정리했습니다.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

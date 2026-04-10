@@ -1,0 +1,106 @@
+name: Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/pages.yml"
+      - "README.md"
+      - "docs/**"
+      - "site/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Configure Pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+
+      - name: Ensure site directory exists
+        shell: bash
+        run: |
+          if [ -d site ]; then
+            exit 0
+          fi
+
+          mkdir -p site
+          cat > site/index.html <<'EOF'
+          <!doctype html>
+          <html lang="ko">
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1">
+              <title>Cortex Translate Service</title>
+              <style>
+                :root {
+                  color-scheme: light dark;
+                  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                }
+                body {
+                  margin: 0;
+                  padding: 3rem 1.5rem;
+                  background: #0f172a;
+                  color: #e2e8f0;
+                }
+                main {
+                  max-width: 48rem;
+                  margin: 0 auto;
+                  background: rgba(15, 23, 42, 0.75);
+                  border: 1px solid rgba(148, 163, 184, 0.25);
+                  border-radius: 16px;
+                  padding: 2rem;
+                }
+                code {
+                  font-family: ui-monospace, SFMono-Regular, monospace;
+                }
+              </style>
+            </head>
+            <body>
+              <main>
+                <h1>Cortex Translate Service</h1>
+                <p>
+                  Snowflake Cortex <code>AI_TRANSLATE</code> 기반 번역 서비스의 핵심
+                  정보와 실행 흐름을 제공합니다.
+                </p>
+                <p>
+                  정적 자산이 없는 경우에도 최소 서비스 개요와 운영 기준을 제공해
+                  배포 경로가 끊기지 않도록 유지합니다.
+                </p>
+              </main>
+            </body>
+          </html>
+          EOF
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        with:
+          path: site
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
