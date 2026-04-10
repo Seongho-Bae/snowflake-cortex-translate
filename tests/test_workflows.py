@@ -12,14 +12,17 @@ def test_pages_workflow_writes_product_facing_fallback_after_early_exit() -> Non
     """The Pages fallback script exits early and keeps fallback copy service-facing."""
     workflow = Path(".github/workflows/pages.yml").read_text(encoding="utf-8")
 
-    assert """run: |
+    assert (
+        """run: |
           if [ -d site ]; then
             exit 0
           fi
 
           mkdir -p site
           cat > site/index.html <<'EOF'
-""" in workflow
+"""
+        in workflow
+    )
     assert "번역 서비스의 핵심" in workflow
     assert "매뉴얼" not in workflow
 
@@ -29,7 +32,8 @@ def test_codeql_workflow_limits_global_permissions_to_read_only() -> None:
     workflow = _read_workflow(".github/workflows/codeql.yml")
 
     assert "permissions:\n  contents: read\n  actions: read\n" in workflow
-    assert """  analyze:
+    assert (
+        """  analyze:
     name: codeql-python
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -37,7 +41,9 @@ def test_codeql_workflow_limits_global_permissions_to_read_only() -> None:
       contents: read
       actions: read
       security-events: write
-""" in workflow
+"""
+        in workflow
+    )
 
 
 def test_scorecard_workflow_limits_global_permissions_to_read_only() -> None:
@@ -45,7 +51,8 @@ def test_scorecard_workflow_limits_global_permissions_to_read_only() -> None:
     workflow = _read_workflow(".github/workflows/scorecard.yml")
 
     assert "permissions:\n  contents: read\n  actions: read\n" in workflow
-    assert """  scorecard:
+    assert (
+        """  scorecard:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -53,7 +60,9 @@ def test_scorecard_workflow_limits_global_permissions_to_read_only() -> None:
       actions: read
       security-events: write
       id-token: write
-""" in workflow
+"""
+        in workflow
+    )
     assert "id: scorecard\n        continue-on-error: true\n" in workflow
     assert "if: always() && hashFiles('results.sarif') != ''\n" in workflow
     assert "if: always() && hashFiles('results.sarif') == ''\n" in workflow
@@ -100,3 +109,31 @@ def test_workflows_do_not_use_deprecated_codeql_v3_pins() -> None:
         "github/codeql-action/upload-sarif@5c8a8a642e79153f5d047b10ec1cba1d1cc65699"
         not in combined
     )
+
+
+def test_dependency_review_workflow_submits_uv_snapshot_before_review() -> None:
+    """The dependency review workflow submits a uv snapshot before comparing deps."""
+    workflow = _read_workflow(".github/workflows/dependency-review.yml")
+
+    assert "permissions:\n  contents: read\n" in workflow
+    assert "pull-requests: read" not in workflow
+    assert (
+        """  dependency-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+"""
+        in workflow
+    )
+    assert (
+        "advanced-security/component-detection-dependency-submission-action@"
+        in workflow
+    )
+    assert workflow.index(
+        "advanced-security/component-detection-dependency-submission-action@"
+    ) < workflow.index("actions/dependency-review-action@")
+    assert "detectorArgs: UvLock=EnableIfDefaultOff" in workflow
+    assert "retry-on-snapshot-warnings: true" in workflow
+    assert "retry-on-snapshot-warnings-timeout: 300" in workflow
