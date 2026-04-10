@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-04-10
+
+### Fixed
+
+- aligned the FastAPI OpenAPI version with packaged release metadata so the
+  published API contract no longer reports a stale historical version
+- replaced stale hard-coded release tag examples in public docs with generic
+  semantic placeholders and locked the contract with regression coverage
+
 ## [0.1.2] - 2026-04-10
 
 ### Added

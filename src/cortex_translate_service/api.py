@@ -2,6 +2,7 @@
 
 import os
 from collections.abc import Callable
+from importlib.metadata import PackageNotFoundError, version as package_version
 from typing import Protocol
 
 from fastapi import Depends, FastAPI, Security
@@ -31,6 +32,16 @@ ServiceFactory = Callable[[], SupportsTranslate]
 AUTHORIZATION_ERROR_MESSAGE = "Invalid API key"
 API_NOT_CONFIGURED_MESSAGE = "Translation API unavailable"
 TRANSLATION_GATEWAY_PUBLIC_MESSAGE = "Translation backend unavailable"
+PACKAGE_NAME = "cortex-translate-service"
+LOCAL_VERSION_FALLBACK = "0.0.0+local"
+
+
+def resolve_api_version() -> str:
+    """Return package metadata version or a safe local fallback."""
+    try:
+        return package_version(PACKAGE_NAME)
+    except PackageNotFoundError:
+        return LOCAL_VERSION_FALLBACK
 
 
 class TranslationRequestBody(BaseModel):
@@ -77,7 +88,7 @@ def build_app(
 
     app = FastAPI(
         title="Cortex Translate Service",
-        version="0.1.1",
+        version=resolve_api_version(),
         description=(
             "REST API for translating text with Snowflake Cortex AI_TRANSLATE "
             "using a named Snowflake connection profile."

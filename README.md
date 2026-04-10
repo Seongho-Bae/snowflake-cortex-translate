@@ -44,11 +44,7 @@ profile and Snowflake Cortex `AI_TRANSLATE`.
 │   ├── service.py
 │   └── snowflake_gateway.py
 └── tests/
-    ├── test_api.py
-    ├── test_cli.py
-    ├── test_domain.py
-    ├── test_service.py
-    └── test_snowflake_gateway.py
+    └── test_*.py
 ```
 
 ## Prerequisites

@@ -67,7 +67,7 @@ Conventional commit prefixes are recommended:
 ## Release Notes
 
 - keep `CHANGELOG.md` in Keep a Changelog format
-- cut container releases from semantic tags like `v0.1.1` on reviewed `main`
+- cut container releases from semantic tags like `vX.Y.Z` on reviewed `main`
   history only
 - use `docs/release-publishing.md` as the operator checklist for GitHub Pages,
   GHCR publishing, and required branch rules
