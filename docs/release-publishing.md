@@ -68,8 +68,8 @@ Recommended release commands:
 ```bash
 git checkout main
 git pull --ff-only origin main
-git tag v0.1.1
-git push origin main v0.1.1
+git tag vX.Y.Z
+git push origin main vX.Y.Z
 ```
 
 The release workflow will:
