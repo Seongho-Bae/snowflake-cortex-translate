@@ -29,11 +29,23 @@ class FakeService:
         return self.result
 
 
+def build_service_factory(service: FakeService | None = None):
+    """Return a service factory without lambda wrappers for CodeQL cleanliness."""
+    if service is None:
+        return FakeService
+
+    def service_factory() -> FakeService:
+        """Return the preconfigured fake service instance for a test."""
+        return service
+
+    return service_factory
+
+
 def test_healthz_returns_ok() -> None:
     """The API exposes a simple health check endpoint."""
     from cortex_translate_service.api import build_app
 
-    client = TestClient(build_app(service_factory=lambda: FakeService()))
+    client = TestClient(build_app(service_factory=build_service_factory()))
 
     response = client.get("/healthz")
 
@@ -53,7 +65,10 @@ def test_create_translation_returns_translation_payload() -> None:
         )
     )
     client = TestClient(
-        build_app(service_factory=lambda: service, required_api_key="test-api-key")
+        build_app(
+            service_factory=build_service_factory(service),
+            required_api_key="test-api-key",
+        )
     )
 
     response = client.post(
@@ -79,7 +94,7 @@ def test_create_translation_returns_request_validation_error() -> None:
 
     client = TestClient(
         build_app(
-            service_factory=lambda: FakeService(), required_api_key="test-api-key"
+            service_factory=build_service_factory(), required_api_key="test-api-key"
         )
     )
 
@@ -103,7 +118,7 @@ def test_create_translation_returns_domain_validation_error() -> None:
 
     client = TestClient(
         build_app(
-            service_factory=lambda: FakeService(), required_api_key="test-api-key"
+            service_factory=build_service_factory(), required_api_key="test-api-key"
         )
     )
 
@@ -134,7 +149,10 @@ def test_create_translation_returns_gateway_error() -> None:
         )
     )
     client = TestClient(
-        build_app(service_factory=lambda: service, required_api_key="test-api-key")
+        build_app(
+            service_factory=build_service_factory(service),
+            required_api_key="test-api-key",
+        )
     )
 
     response = client.post(
@@ -160,7 +178,7 @@ def test_openapi_exposes_translation_endpoint() -> None:
 
     client = TestClient(
         build_app(
-            service_factory=lambda: FakeService(), required_api_key="test-api-key"
+            service_factory=build_service_factory(), required_api_key="test-api-key"
         )
     )
 
@@ -176,7 +194,7 @@ def test_openapi_marks_translation_endpoint_with_required_api_key_security() -> 
 
     client = TestClient(
         build_app(
-            service_factory=lambda: FakeService(), required_api_key="test-api-key"
+            service_factory=build_service_factory(), required_api_key="test-api-key"
         )
     )
 
@@ -200,7 +218,7 @@ def test_create_translation_requires_api_key() -> None:
 
     client = TestClient(
         build_app(
-            service_factory=lambda: FakeService(), required_api_key="test-api-key"
+            service_factory=build_service_factory(), required_api_key="test-api-key"
         )
     )
 
@@ -225,7 +243,7 @@ def test_create_translation_rejects_requests_when_api_key_not_configured() -> No
     from cortex_translate_service.api import build_app
 
     client = TestClient(
-        build_app(service_factory=lambda: FakeService(), required_api_key="")
+        build_app(service_factory=build_service_factory(), required_api_key="")
     )
 
     response = client.post(
