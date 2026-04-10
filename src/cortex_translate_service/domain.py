@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass
 
+MAX_TEXT_LENGTH = 5_000
+
 
 class TranslationValidationError(ValueError):
     """Raised when translation request or result values are invalid."""
@@ -23,6 +25,10 @@ class TranslationRequest:
 
         if not normalized_text:
             raise TranslationValidationError("text is required")
+        if len(normalized_text) > MAX_TEXT_LENGTH:
+            raise TranslationValidationError(
+                f"text must be at most {MAX_TEXT_LENGTH} characters"
+            )
         if not normalized_target_language:
             raise TranslationValidationError("target_language is required")
 
@@ -58,6 +64,7 @@ class TranslationResult:
 
 
 __all__ = [
+    "MAX_TEXT_LENGTH",
     "TranslationRequest",
     "TranslationResult",
     "TranslationValidationError",

@@ -4,17 +4,12 @@ import argparse
 import sys
 from collections.abc import Sequence
 
+from cortex_translate_service.bootstrap import build_service_from_env
 from cortex_translate_service.domain import (
     TranslationRequest,
     TranslationValidationError,
 )
-from cortex_translate_service.service import TranslationGatewayError, TranslationService
-from cortex_translate_service.snowflake_gateway import build_gateway_from_env
-
-
-def build_service_from_env() -> TranslationService:
-    """Build the application service from environment-backed infrastructure."""
-    return TranslationService(build_gateway_from_env())
+from cortex_translate_service.service import TranslationGatewayError
 
 
 def build_parser() -> argparse.ArgumentParser:

@@ -1,0 +1,57 @@
+name: OSSF Scorecard
+
+on:
+  branch_protection_rule:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "11 4 * * 2"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  scorecard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+      id-token: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Run OSSF Scorecard
+        id: scorecard
+        continue-on-error: true
+        uses: ossf/scorecard-action@4eaacf0543bb3f2c246792bd56e8cdeffafb205a # v2.4.3
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          publish_results: true
+
+      - name: Upload Scorecard SARIF
+        if: always() && hashFiles('results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
+        with:
+          sarif_file: results.sarif
+
+      - name: Summarize skipped Scorecard publication
+        if: always() && hashFiles('results.sarif') == ''
+        shell: bash
+        run: |
+          {
+            echo "## OSSF Scorecard"
+            echo ""
+            echo "The Scorecard action did not produce a SARIF artifact during this run."
+            echo "Inspect the 'Run OSSF Scorecard' step logs for the detailed failure context."
+          } >> "$GITHUB_STEP_SUMMARY"

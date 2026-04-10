@@ -63,7 +63,7 @@ Retain the current DDD-style translation core and add a thin FastAPI delivery la
 ### Repository publication design
 
 1. **Repository name**
-   - Use `cortex-translate-service` as the GitHub repository slug.
+   - Use `snowflake-cortex-translate` as the GitHub repository slug.
    - This keeps the repo concise while still matching the current package name and the service/API direction.
 
 2. **Git Flow model**
@@ -126,7 +126,8 @@ Retain the current DDD-style translation core and add a thin FastAPI delivery la
 ## Decisions and assumptions
 
 - Choose FastAPI because it gives typed request validation, OpenAPI generation, and a minimal REST surface with low ceremony.
-- Keep the package name `cortex-translate-service` to minimize churn and align with the recommended repository slug.
+- Keep the package name `cortex-translate-service` to minimize churn even though
+  the public repository slug is `snowflake-cortex-translate`.
 - Use a static Pages site instead of a JS-heavy docs framework to reduce maintenance overhead.
 - Use Git Flow because the user explicitly requested it, even though a simpler trunk-only model would also work.
 - Treat GHCR publication through GitHub Actions as the authoritative release path.
