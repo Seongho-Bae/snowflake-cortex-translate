@@ -1,6 +1,6 @@
 """Regression tests for package/API/public version consistency."""
 
-from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -20,6 +20,26 @@ def test_openapi_version_matches_installed_package_metadata() -> None:
 
     assert response.status_code == 200
     assert response.json()["info"]["version"] == version(PACKAGE_NAME)
+
+
+def test_openapi_version_falls_back_when_package_metadata_is_unavailable(
+    monkeypatch,
+) -> None:
+    """The API still boots when package metadata cannot be resolved."""
+    from cortex_translate_service import api
+
+    def raise_package_not_found(_: str) -> str:
+        """Raise the metadata lookup error used by importlib."""
+        raise PackageNotFoundError
+
+    monkeypatch.setattr(api, "package_version", raise_package_not_found)
+
+    client = TestClient(api.build_app(required_api_key="test-api-key"))
+
+    response = client.get("/openapi.json")
+
+    assert response.status_code == 200
+    assert response.json()["info"]["version"] == "0.0.0+local"
 
 
 def test_public_release_examples_use_semantic_version_placeholders() -> None:
