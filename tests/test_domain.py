@@ -3,6 +3,7 @@
 import pytest
 
 from cortex_translate_service.domain import (
+    MAX_TEXT_LENGTH,
     TranslationRequest,
     TranslationResult,
     TranslationValidationError,
@@ -37,6 +38,19 @@ def test_translation_request_rejects_blank_text() -> None:
     """Translation requests require source text."""
     with pytest.raises(TranslationValidationError, match="text is required"):
         TranslationRequest(text="   ", source_language="en", target_language="ko")
+
+
+def test_translation_request_rejects_text_over_max_length() -> None:
+    """Translation requests reject text that exceeds the cost-control limit."""
+    with pytest.raises(
+        TranslationValidationError,
+        match=f"text must be at most {MAX_TEXT_LENGTH} characters",
+    ):
+        TranslationRequest(
+            text="a" * (MAX_TEXT_LENGTH + 1),
+            source_language="en",
+            target_language="ko",
+        )
 
 
 def test_translation_result_rejects_blank_translated_text() -> None:
