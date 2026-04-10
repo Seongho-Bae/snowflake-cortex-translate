@@ -9,6 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-04-10
+
+### Added
+
+- workflow regression coverage for Pages fallback bootstrapping, dependency-review
+  graph probing, security policy links, and GitHub Actions pin hygiene
+
+### Changed
+
+- refreshed the develop branch to the released mainline before merging follow-up
+  dependency updates
+- updated GitHub Actions checkout, setup-uv, and CodeQL pins to current
+  Node24-compatible immutable revisions
+- adjusted dependency review to summarize the missing dependency-graph blocker
+  instead of leaving pull requests red when GitHub has the feature disabled
+- upgraded `snowflake-connector-python` to 4.4.0, `pytest` to 9.0.3, and
+  `pytest-cov` to 7.1.0 with regenerated `uv.lock`
+- removed CodeQL unnecessary-lambda findings from REST API tests without
+  changing test behavior
+
+### Fixed
+
+- repaired the GitHub Pages fallback heredoc so the Pages workflow can publish
+  even when `site/` assets are absent at build time
+
+### Security
+
+- scoped CodeQL and Scorecard write permissions to job level and preserved
+  explicit fallback reporting when Scorecard cannot publish SARIF
+- linked `SECURITY.md` to the private advisory endpoint and maintainer contact
+  address for direct vulnerability disclosure
+
 ## [0.1.1] - 2026-04-10
 
 ### Added
