@@ -1,12 +1,12 @@
 [project]
 name = "cortex-translate-service"
-version = "0.1.1"
+version = "0.1.2"
 description = "Snowflake Cortex AI translation service using a named dev profile."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
   "fastapi>=0.135.3",
-  "snowflake-connector-python>=3.17.3,<4",
+  "snowflake-connector-python>=3.17.3,<5",
   "uvicorn>=0.44.0",
 ]
 
@@ -15,8 +15,8 @@ dev = [
   "httpx>=0.28.1",
   "interrogate>=1.7.0,<2",
   "mypy>=1.20.0",
-  "pytest>=8.3.5,<9",
-  "pytest-cov>=6.1.1,<7",
+  "pytest>=8.3.5,<10",
+  "pytest-cov>=6.1.1,<8",
 ]
 
 [tool.interrogate]
