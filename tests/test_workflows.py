@@ -129,9 +129,16 @@ def test_release_notes_embed_manual_screenshots() -> None:
     assert "![OpenSSF Scorecard viewer screenshot]" in release_notes
     assert "![GitHub release page screenshot]" in release_notes
     assert "assets/scorecard-viewer.png" in release_notes
-    assert "assets/release-page-v0.1.4.png" in release_notes
     assert Path("docs/assets/scorecard-viewer.png").exists()
-    assert Path("docs/assets/release-page-v0.1.4.png").exists()
+    release_line = next(
+        line
+        for line in release_notes.splitlines()
+        if line.startswith("![GitHub release page screenshot](")
+    )
+    release_asset = release_line.split("](", maxsplit=1)[1].rstrip(")")
+    assert release_asset.startswith("assets/release-page-v")
+    assert release_asset.endswith(".png")
+    assert Path(f"docs/{release_asset}").exists()
 
 
 def test_dockerfile_pins_runtime_base_image_by_digest() -> None:

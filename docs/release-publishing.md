@@ -105,7 +105,7 @@ The release workflow will:
 ![GitHub release page screenshot](assets/release-page-v0.1.4.png)
 
 The release page screenshot above captures the published `v0.1.4` GitHub
-release with its current public notes and assets.
+release at capture time, including the then-public notes and assets.
 
 ## Local Verification Before Release
 
