@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+UPLOAD_ARTIFACT_PIN = "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+
 
 def _read_workflow(relative_path: str) -> str:
     """Read a GitHub workflow YAML file as UTF-8 text."""
@@ -68,9 +70,7 @@ def test_scorecard_workflow_limits_global_permissions_to_read_only() -> None:
     )
     assert "id: scorecard\n        continue-on-error: true\n" in workflow
     assert "if: always() && hashFiles('results.sarif') != ''\n" in workflow
-    assert (
-        "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" in workflow
-    )
+    assert UPLOAD_ARTIFACT_PIN in workflow
     assert "GITHUB_STEP_SUMMARY" in workflow
 
 
@@ -87,10 +87,7 @@ def test_scorecard_workflow_keeps_publishable_job_separate_from_reporting() -> N
         in scorecard_job
     )
     assert "publish_results: true" in scorecard_job
-    assert (
-        "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
-        in scorecard_job
-    )
+    assert UPLOAD_ARTIFACT_PIN in scorecard_job
     assert "id: scorecard_artifact" in scorecard_job
     assert "run:" not in scorecard_job
 
