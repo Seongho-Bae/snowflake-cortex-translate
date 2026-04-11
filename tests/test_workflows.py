@@ -68,7 +68,9 @@ def test_scorecard_workflow_limits_global_permissions_to_read_only() -> None:
     )
     assert "id: scorecard\n        continue-on-error: true\n" in workflow
     assert "if: always() && hashFiles('results.sarif') != ''\n" in workflow
-    assert "actions/upload-artifact@v4" in workflow
+    assert (
+        "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02" in workflow
+    )
     assert "GITHUB_STEP_SUMMARY" in workflow
 
 
