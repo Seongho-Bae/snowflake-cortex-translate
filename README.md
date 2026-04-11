@@ -1,5 +1,7 @@
 # Cortex Translate Service
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Seongho-Bae/snowflake-cortex-translate/badge)](https://scorecard.dev/viewer/?uri=github.com/Seongho-Bae/snowflake-cortex-translate)
+
 Local Python translation service and REST API that use a Snowflake `dev`
 profile and Snowflake Cortex `AI_TRANSLATE`.
 
