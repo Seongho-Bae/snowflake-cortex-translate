@@ -49,13 +49,6 @@ The public API can return `404 Not Found` until a publishable Scorecard run on
 `main` has been ingested. Re-run `.github/workflows/scorecard.yml` on `main`
 after any publishability fix, then recheck the API and viewer.
 
-If Scorecard still reports `Signed-Releases` gaps after a tag has already been
-published, run `.github/workflows/release-evidence-backfill.yml` to attach the
-existing GHCR attestation bundles (`*.intoto.jsonl`) and digest manifests to the
-matching GitHub Releases. The workflow also creates a GitHub Release object for
-the tag first when only the git tag exists and no release record has been
-published yet.
-
 ## CI and Security Workflow Inventory
 
 | Workflow | Purpose | Trigger |
