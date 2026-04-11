@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-04-11
+
+### Changed
+
+- updated the GitHub Pages upload workflow to `actions/upload-pages-artifact`
+  `v5.0.0` and `actions/configure-pages` `v6.0.0`
+- refreshed the GHCR release workflow to `docker/build-push-action` `v7.1.0`
+
+### Added
+
+- committed release-manual screenshots for the published Scorecard viewer and
+  `v0.1.4` release page so the operator guide now includes visual references
+
 ## [0.1.4] - 2026-04-11
 
 ### Added
