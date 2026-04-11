@@ -122,6 +122,18 @@ def test_release_notes_document_scorecard_api_and_viewer_urls() -> None:
     ) in release_notes
 
 
+def test_release_notes_embed_manual_screenshots() -> None:
+    """The release manual includes committed screenshots with alt text."""
+    release_notes = Path("docs/release-publishing.md").read_text(encoding="utf-8")
+
+    assert "![OpenSSF Scorecard viewer screenshot]" in release_notes
+    assert "![GitHub release page screenshot]" in release_notes
+    assert "assets/scorecard-viewer.png" in release_notes
+    assert "assets/release-page-v0.1.4.png" in release_notes
+    assert Path("docs/assets/scorecard-viewer.png").exists()
+    assert Path("docs/assets/release-page-v0.1.4.png").exists()
+
+
 def test_dockerfile_pins_runtime_base_image_by_digest() -> None:
     """The runtime Docker base image stays pinned by digest for Scorecard."""
     dockerfile = Path("Dockerfile").read_text(encoding="utf-8")
