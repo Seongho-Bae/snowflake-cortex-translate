@@ -69,7 +69,7 @@ def test_scorecard_workflow_limits_global_permissions_to_read_only() -> None:
     assert "id: scorecard\n        continue-on-error: true\n" in workflow
     assert "if: always() && hashFiles('results.sarif') != ''\n" in workflow
     assert (
-        "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02" in workflow
+        "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" in workflow
     )
     assert "GITHUB_STEP_SUMMARY" in workflow
 
@@ -87,7 +87,10 @@ def test_scorecard_workflow_keeps_publishable_job_separate_from_reporting() -> N
         in scorecard_job
     )
     assert "publish_results: true" in scorecard_job
-    assert "actions/upload-artifact@" in scorecard_job
+    assert (
+        "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+        in scorecard_job
+    )
     assert "id: scorecard_artifact" in scorecard_job
     assert "run:" not in scorecard_job
 
@@ -120,6 +123,16 @@ def test_release_notes_document_scorecard_api_and_viewer_urls() -> None:
         "https://scorecard.dev/viewer/?uri=github.com/Seongho-Bae/"
         "snowflake-cortex-translate"
     ) in release_notes
+
+
+def test_dockerfile_pins_runtime_base_image_by_digest() -> None:
+    """The runtime Docker base image stays pinned by digest for Scorecard."""
+    dockerfile = Path("Dockerfile").read_text(encoding="utf-8")
+
+    assert (
+        "FROM python:3.12-slim-bookworm@sha256:"
+        "d97792894a6a4162cae14da44542a83c75e56c77a27b92d58f3f83b7bc961292 AS runtime"
+    ) in dockerfile
 
 
 def test_security_policy_links_private_reporting_channel() -> None:

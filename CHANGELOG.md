@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   publication rules by isolating shell reporting in a follow-up job
 - preserved the generated Scorecard SARIF as an Actions artifact so failed
   publication attempts still leave inspectable evidence for operators
+- pinned the runtime Docker base image by digest and moved the Scorecard SARIF
+  upload action to a Node24-ready immutable revision to remove remaining
+  actionable Scorecard and workflow warnings
 
 ## [0.1.3] - 2026-04-10
 
