@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-04-11
+
+### Added
+
+- a public OpenSSF Scorecard badge plus documented API and viewer endpoints for
+  repository governance checks
+
+### Fixed
+
+- kept the OSSF Scorecard analysis job compatible with `api.scorecard.dev`
+  publication rules by isolating shell reporting in a follow-up job
+- preserved the generated Scorecard SARIF as an Actions artifact so failed
+  publication attempts still leave inspectable evidence for operators
+
 ## [0.1.3] - 2026-04-10
 
 ### Fixed
