@@ -52,10 +52,13 @@ def test_scorecard_workflow_limits_global_permissions_to_read_only() -> None:
 
     assert "permissions:\n  contents: read\n  actions: read\n" in workflow
     assert (
-        """  scorecard:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    permissions:
+        "  scorecard:\n    runs-on: ubuntu-latest\n    timeout-minutes: 20\n"
+        in workflow
+    )
+    assert "scorecard-step-outcome: ${{ steps.scorecard.outcome }}" in workflow
+    assert "sarif-artifact-outcome: ${{ steps.scorecard_artifact.outcome }}" in workflow
+    assert (
+        """    permissions:
       contents: read
       actions: read
       security-events: write
@@ -65,8 +68,56 @@ def test_scorecard_workflow_limits_global_permissions_to_read_only() -> None:
     )
     assert "id: scorecard\n        continue-on-error: true\n" in workflow
     assert "if: always() && hashFiles('results.sarif') != ''\n" in workflow
-    assert "if: always() && hashFiles('results.sarif') == ''\n" in workflow
+    assert "actions/upload-artifact@v4" in workflow
     assert "GITHUB_STEP_SUMMARY" in workflow
+
+
+def test_scorecard_workflow_keeps_publishable_job_separate_from_reporting() -> None:
+    """The Scorecard publish job keeps API-safe steps isolated from shell reporting."""
+    workflow = _read_workflow(".github/workflows/scorecard.yml")
+    scorecard_job = workflow.split("  scorecard:\n", maxsplit=1)[1].split(
+        "\n  scorecard-report:\n", maxsplit=1
+    )[0]
+
+    assert "scorecard-step-outcome: ${{ steps.scorecard.outcome }}" in scorecard_job
+    assert (
+        "sarif-artifact-outcome: ${{ steps.scorecard_artifact.outcome }}"
+        in scorecard_job
+    )
+    assert "publish_results: true" in scorecard_job
+    assert "actions/upload-artifact@" in scorecard_job
+    assert "id: scorecard_artifact" in scorecard_job
+    assert "run:" not in scorecard_job
+
+    report_job = workflow.split("\n  scorecard-report:\n", maxsplit=1)[1]
+    assert "needs: scorecard" in report_job
+    assert "run: |" in report_job
+
+
+def test_readme_exposes_scorecard_badge_and_viewer_link() -> None:
+    """The README surfaces the public Scorecard badge and viewer URL."""
+    readme = Path("README.md").read_text(encoding="utf-8")
+
+    assert (
+        "[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/"
+        "Seongho-Bae/snowflake-cortex-translate/badge)]"
+        "(https://scorecard.dev/viewer/?uri=github.com/"
+        "Seongho-Bae/snowflake-cortex-translate)"
+    ) in readme
+
+
+def test_release_notes_document_scorecard_api_and_viewer_urls() -> None:
+    """The release notes document the live Scorecard API and viewer endpoints."""
+    release_notes = Path("docs/release-publishing.md").read_text(encoding="utf-8")
+
+    assert (
+        "https://api.scorecard.dev/projects/github.com/Seongho-Bae/"
+        "snowflake-cortex-translate"
+    ) in release_notes
+    assert (
+        "https://scorecard.dev/viewer/?uri=github.com/Seongho-Bae/"
+        "snowflake-cortex-translate"
+    ) in release_notes
 
 
 def test_security_policy_links_private_reporting_channel() -> None:

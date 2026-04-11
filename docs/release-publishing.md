@@ -33,6 +33,22 @@ Repository administrators should configure the following GitHub settings:
    - enable secret scanning and push protection if available
    - enable private vulnerability reporting / security advisories
 
+4. **Workflow publication constraints**
+   - keep the OSSF Scorecard analysis job publish-compatible with the Scorecard
+     API by limiting that job to allowlisted `uses:` steps only
+   - use a follow-up reporting job if you need shell-based summaries or API
+     rechecks around Scorecard publication
+
+## OSSF Scorecard API and Viewer
+
+- API: <https://api.scorecard.dev/projects/github.com/Seongho-Bae/snowflake-cortex-translate>
+- Viewer: <https://scorecard.dev/viewer/?uri=github.com/Seongho-Bae/snowflake-cortex-translate>
+- Badge: <https://api.scorecard.dev/projects/github.com/Seongho-Bae/snowflake-cortex-translate/badge>
+
+The public API can return `404 Not Found` until a publishable Scorecard run on
+`main` has been ingested. Re-run `.github/workflows/scorecard.yml` on `main`
+after any publishability fix, then recheck the API and viewer.
+
 ## CI and Security Workflow Inventory
 
 | Workflow | Purpose | Trigger |

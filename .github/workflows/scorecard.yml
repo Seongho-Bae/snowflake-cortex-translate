@@ -17,6 +17,9 @@ jobs:
   scorecard:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    outputs:
+      scorecard-step-outcome: ${{ steps.scorecard.outcome }}
+      sarif-artifact-outcome: ${{ steps.scorecard_artifact.outcome }}
     permissions:
       contents: read
       actions: read
@@ -45,13 +48,41 @@ jobs:
         with:
           sarif_file: results.sarif
 
-      - name: Summarize skipped Scorecard publication
-        if: always() && hashFiles('results.sarif') == ''
+      - name: Upload Scorecard artifact
+        id: scorecard_artifact
+        if: always() && hashFiles('results.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ossf-scorecard-sarif
+          path: results.sarif
+          if-no-files-found: error
+
+  scorecard-report:
+    if: always()
+    needs: scorecard
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+
+    steps:
+      - name: Summarize Scorecard publication status
         shell: bash
         run: |
           {
             echo "## OSSF Scorecard"
             echo ""
-            echo "The Scorecard action did not produce a SARIF artifact during this run."
-            echo "Inspect the 'Run OSSF Scorecard' step logs for the detailed failure context."
+            echo "- API: https://api.scorecard.dev/projects/github.com/Seongho-Bae/snowflake-cortex-translate"
+            echo "- Viewer: https://scorecard.dev/viewer/?uri=github.com/Seongho-Bae/snowflake-cortex-translate"
+            echo ""
+            if [ "${{ needs.scorecard.outputs.scorecard-step-outcome }}" != "success" ]; then
+              echo "The publishable Scorecard step did not complete successfully. Inspect the scorecard job logs before trusting the public API/viewer state."
+            elif [ "${{ needs.scorecard.outputs.sarif-artifact-outcome }}" != "success" ]; then
+              echo "The publishable Scorecard step completed, but it did not leave a SARIF artifact for upload. Recheck the action log before trusting the public API/viewer state."
+            elif [ "${{ needs.scorecard.result }}" = "success" ]; then
+              echo "The publishable Scorecard job completed. If the public API still shows 404, wait for ingestion and recheck the API/viewer."
+            else
+              echo "The publishable Scorecard job did not complete successfully. Inspect the scorecard job logs before trusting the public API/viewer state."
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
