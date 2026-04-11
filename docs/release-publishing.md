@@ -45,6 +45,12 @@ Repository administrators should configure the following GitHub settings:
 - Viewer: <https://scorecard.dev/viewer/?uri=github.com/Seongho-Bae/snowflake-cortex-translate>
 - Badge: <https://api.scorecard.dev/projects/github.com/Seongho-Bae/snowflake-cortex-translate/badge>
 
+![OpenSSF Scorecard viewer screenshot](assets/scorecard-viewer.png)
+
+The screenshot above records what the public Scorecard viewer looked like after
+publication. Use it as a visual reference for the expected page, then re-open
+the live viewer URL to confirm current reachability and ingestion state.
+
 The public API can return `404 Not Found` until a publishable Scorecard run on
 `main` has been ingested. Re-run `.github/workflows/scorecard.yml` on `main`
 after any publishability fix, then recheck the API and viewer.
@@ -95,6 +101,11 @@ The release workflow will:
 - build `linux/amd64` and `linux/arm64` images
 - push to `ghcr.io/seongho-bae/snowflake-cortex-translate`
 - attach SBOM and SLSA-style provenance attestations through BuildKit
+
+![GitHub release page screenshot](assets/release-page-v0.1.4.png)
+
+The release page screenshot above captures the published `v0.1.4` GitHub
+release at capture time, including the then-public notes and assets.
 
 ## Local Verification Before Release
 

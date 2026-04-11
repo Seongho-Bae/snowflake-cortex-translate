@@ -122,6 +122,25 @@ def test_release_notes_document_scorecard_api_and_viewer_urls() -> None:
     ) in release_notes
 
 
+def test_release_notes_embed_manual_screenshots() -> None:
+    """The release manual includes committed screenshots with alt text."""
+    release_notes = Path("docs/release-publishing.md").read_text(encoding="utf-8")
+
+    assert "![OpenSSF Scorecard viewer screenshot]" in release_notes
+    assert "![GitHub release page screenshot]" in release_notes
+    assert "assets/scorecard-viewer.png" in release_notes
+    assert Path("docs/assets/scorecard-viewer.png").exists()
+    release_line = next(
+        line
+        for line in release_notes.splitlines()
+        if line.startswith("![GitHub release page screenshot](")
+    )
+    release_asset = release_line.split("](", maxsplit=1)[1].rstrip(")")
+    assert release_asset.startswith("assets/release-page-v")
+    assert release_asset.endswith(".png")
+    assert Path(f"docs/{release_asset}").exists()
+
+
 def test_dockerfile_pins_runtime_base_image_by_digest() -> None:
     """The runtime Docker base image stays pinned by digest for Scorecard."""
     dockerfile = Path("Dockerfile").read_text(encoding="utf-8")
