@@ -1,0 +1,77 @@
+name: Backfill release evidence
+
+on:
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: Space-separated semantic tags to backfill
+        required: true
+        default: "v0.1.1 v0.1.2 v0.1.3 v0.1.4"
+
+permissions:
+  contents: read
+
+jobs:
+  backfill-release-attestations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      packages: read
+      attestations: read
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Log in to GHCR
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Download and upload release attestation bundles
+        shell: bash
+        env:
+          TAGS: ${{ inputs.tags }}
+        run: |
+          set -euo pipefail
+
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+
+          for tag in $TAGS; do
+            version_tag="${tag#v}"
+            workdir="${RUNNER_TEMP}/${tag}"
+
+            rm -rf "$workdir"
+            mkdir -p "$workdir"
+
+            if ! gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              gh release create "$tag" --repo "$GITHUB_REPOSITORY" --title "$tag" --generate-notes --verify-tag
+            fi
+
+            (
+              cd "$workdir"
+              gh attestation download "oci://${image}:${version_tag}" --repo "$GITHUB_REPOSITORY"
+
+              shopt -s nullglob
+              bundles=(sha256*.jsonl)
+              if [ "${#bundles[@]}" -eq 0 ]; then
+                echo "No attestation bundle downloaded for ${tag}" >&2
+                exit 1
+              fi
+
+              for bundle in "${bundles[@]}"; do
+                digest_base="${bundle%.jsonl}"
+                digest="${digest_base/-/:}"
+                attestation_asset="${tag}-${digest_base}.intoto.jsonl"
+                digest_asset="${tag}-${digest_base}.ghcr-digest.txt"
+
+                mv "$bundle" "$attestation_asset"
+                printf '%s:%s@%s\n' "$image" "$version_tag" "$digest" > "$digest_asset"
+              done
+            )
+
+            gh release upload "$tag" "$workdir"/*.intoto.jsonl "$workdir"/*.ghcr-digest.txt --repo "$GITHUB_REPOSITORY" --clobber
+          done

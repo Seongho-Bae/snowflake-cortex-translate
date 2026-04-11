@@ -209,3 +209,20 @@ def test_dependency_review_workflow_probes_graph_before_review() -> None:
         "Dependency review was skipped because the repository dependency graph is unavailable."
         in workflow
     )
+
+
+def test_release_evidence_backfill_workflow_downloads_release_attestations() -> None:
+    """The release evidence workflow backfills intoto assets onto GitHub Releases."""
+    workflow = _read_workflow(".github/workflows/release-evidence-backfill.yml")
+
+    assert "workflow_dispatch:" in workflow
+    assert 'default: "v0.1.1 v0.1.2 v0.1.3 v0.1.4"' in workflow
+    assert "attestations: read" in workflow
+    assert "packages: read" in workflow
+    assert "contents: write" in workflow
+    assert "docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121" in workflow
+    assert "gh attestation download" in workflow
+    assert "*.intoto.jsonl" in workflow
+    assert "gh release create" in workflow
+    assert "--verify-tag" in workflow
+    assert "gh release upload" in workflow
