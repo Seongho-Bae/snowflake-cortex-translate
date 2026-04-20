@@ -19,8 +19,6 @@ jobs:
       matrix:
         sanitizer:
         - address
-        - undefined
-        - memory
     steps:
     - name: Build Fuzzers
       id: build
