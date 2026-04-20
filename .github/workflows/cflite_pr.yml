@@ -22,12 +22,12 @@ jobs:
     steps:
     - name: Build Fuzzers
       id: build
-      uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+      uses: google/clusterfuzzlite/actions/build_fuzzers@11d512a842bfae6f43698d28ed5554da0a200de6
       with:
         language: python
         sanitizer: ${{ matrix.sanitizer }}
     - name: Run Fuzzers
-      uses: google/clusterfuzzlite/actions/run_fuzzers@v1
+      uses: google/clusterfuzzlite/actions/run_fuzzers@11d512a842bfae6f43698d28ed5554da0a200de6
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         fuzz-seconds: 600
