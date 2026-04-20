@@ -6,7 +6,8 @@ def TestOneInput(data):
     try:
         text = fdp.ConsumeString(100)
         _ = text.encode("utf-8")
-    except Exception:
+    except Exception as e:
+        # ignore fuzzing exceptions
         pass
 
 atheris.Setup(sys.argv, TestOneInput)
