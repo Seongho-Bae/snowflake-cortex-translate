@@ -12,7 +12,7 @@ Use this skill when encountering Linter warnings, Deprecated messages, formattin
 ### 1. Identify the Warning/Error
 - Run the appropriate linter, type checker, or test framework.
 - Look at the logs for warnings, deprecated usages, or security issues.
-- **Rule:** Warnings are not to be bypassed. Strix or similar security scanners should not be treated as mere blockers but as items to remediate immediately.
+- **Rule:** Warnings are not to be bypassed. Strix findings are absolute blockers and must be fixed (no skipping). Other security scanners should also be treated as items to remediate immediately.
 
 ### 2. Root Cause Analysis
 - Determine why the warning or error exists. Is it a legacy API, an incorrect configuration, or a missing dependency?
@@ -30,7 +30,7 @@ Use this skill when encountering Linter warnings, Deprecated messages, formattin
 ## Kubernetes Consideration
 If the error or security flaw relates to Kubernetes (e.g., missing security contexts, exposed ports):
 - Ensure that the corresponding Kubernetes manifests (`.yaml`) or configurations are updated.
-- Verify that standard security contexts (like `runAsNonRoot`, `readOnlyRootFilesystem`) are applied if applicable.
+- Verify that standard security contexts are applied. Specifically, Kubernetes manifests must define `runAsNonRoot: true`, `readOnlyRootFilesystem: true`, and `allowPrivilegeEscalation: false`.
 
 ## Conclusion
 Once fixed, report the successful remediation of the root cause in the relevant task or PR.
