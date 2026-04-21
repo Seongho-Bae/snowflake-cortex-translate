@@ -1,6 +1,6 @@
 [project]
 name = "cortex-translate-service"
-version = "0.1.6"
+version = "0.1.8"
 description = "Snowflake Cortex AI translation service using a named dev profile."
 readme = "README.md"
 requires-python = ">=3.12"
