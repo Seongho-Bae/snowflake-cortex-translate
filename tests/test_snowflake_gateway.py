@@ -213,3 +213,18 @@ def test_build_gateway_from_env_rejects_invalid_timeout(
         match="SNOWFLAKE_STATEMENT_TIMEOUT_SECONDS must be an integer",
     ):
         build_gateway_from_env(connect_function=lambda **_: None)
+
+def test_snowflake_gateway_parses_invalid_json_object_string_payloads() -> None:
+    """Stringified Snowflake OBJECT payloads that are invalid JSON are returned as strings."""
+    request = TranslationRequest(
+        text="Hello", source_language="en", target_language="ko"
+    )
+    gateway = SnowflakeTranslationGateway(
+        connect_function=lambda **_: FakeConnection(
+            FakeCursor(('{ invalid json }',))
+        )
+    )
+
+    result = gateway.translate(request)
+
+    assert result.translated_text == "{ invalid json }"
