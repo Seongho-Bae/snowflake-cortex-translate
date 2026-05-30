@@ -95,6 +95,12 @@ class SnowflakeTranslationGateway:
         if not isinstance(payload, str):
             return payload
 
+        # Performance optimization:
+        # Avoid throwing and catching JSONDecodeError for standard scalar strings.
+        # Snowflake AI_TRANSLATE json payloads are typically objects '{' or occasionally arrays '['.
+        if not payload.lstrip().startswith(("{", "[")):
+            return payload
+
         try:
             return json.loads(payload)
         except json.JSONDecodeError:

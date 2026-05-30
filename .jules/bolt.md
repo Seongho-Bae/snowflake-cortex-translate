@@ -1,0 +1,3 @@
+## 2024-05-30 - Optimization Learnings
+**Learning:** Python exception handling (`try`/`except`) is particularly slow when used for flow control on the hot path. For string parsing, catching `json.JSONDecodeError` for every normal string payload is a significant bottleneck. Adding a simple string prefix check `startswith("{")` drastically speeds up the normal flow without sacrificing correctness, as `AI_TRANSLATE` returns either strings or JSON objects.
+**Action:** Always look for opportunities to replace expensive `try`/`except` blocks with simple condition checks on the hot path, particularly when parsing payloads where the normal case is a plain string.
