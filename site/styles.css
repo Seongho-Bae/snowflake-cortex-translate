@@ -46,7 +46,9 @@ a:hover {
 
 a:focus-visible,
 summary:focus-visible,
-button:focus-visible {
+button:focus-visible,
+pre:focus-visible,
+.table-wrap:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 3px;
   border-radius: 0.4rem;
