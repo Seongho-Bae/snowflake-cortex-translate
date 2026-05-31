@@ -1,0 +1,3 @@
+## 2024-06-01 - [Keyboard Accessibility for Scrollable Elements]
+**Learning:** Elements with `overflow-x: auto` (like `<pre>` blocks or tables wrapped in a div) are not inherently keyboard accessible. Keyboard-only users and screen reader users might not be able to scroll content that overflows its container horizontally.
+**Action:** Always add `tabindex="0"` to containers with `overflow: auto` or `overflow-x: auto` (like `.table-wrap` and `<pre>`) to ensure they receive keyboard focus. Additionally, ensure there is a clear `:focus-visible` outline for these elements so users know when they are focused and can be scrolled.
