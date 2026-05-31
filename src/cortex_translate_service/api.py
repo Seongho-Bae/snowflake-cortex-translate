@@ -1,5 +1,6 @@
 """FastAPI delivery layer for the Snowflake Cortex translation service."""
 
+import functools
 import os
 from collections.abc import Callable
 from importlib.metadata import PackageNotFoundError, version as package_version
@@ -100,6 +101,7 @@ def build_app(
         scheme_name="APIKeyHeader",
     )
 
+    @functools.cache
     def get_service() -> SupportsTranslate:
         """Provide the translation service dependency."""
         return service_factory()
