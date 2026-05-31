@@ -1,0 +1,4 @@
+## 2024-06-25 - [Timing Attack Vulnerability in API Key Comparison]
+**Vulnerability:** The API key validation in `src/cortex_translate_service/api.py` was using standard string comparison (`!=`) to compare the provided `x_api_key` against the `configured_api_key`. This exposes a timing attack vulnerability where an attacker could theoretically guess the API key character by character by measuring the exact time taken to reject an invalid key (since `!=` returns false early upon the first mismatched character).
+**Learning:** Standard string comparisons stop at the first non-matching character, leading to varied response times that leak information about the secret string length and content.
+**Prevention:** Always use constant-time string comparison functions like `secrets.compare_digest` in Python when verifying secrets, tokens, or API keys.
