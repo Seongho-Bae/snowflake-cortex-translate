@@ -1,0 +1,4 @@
+## 2025-02-27 - [Sentinel: Timing attack vulnerability in API key comparison]
+**Vulnerability:** The API key verification check (`x_api_key != configured_api_key`) used simple string comparison (`!=`), exposing the application to timing attacks.
+**Learning:** Standard string comparison operators (`==` or `!=`) short-circuit, which means they return `False` as soon as the first mismatched character is found. An attacker can measure the time it takes for the application to reject an incorrect API key. By making repeated requests and analyzing the response times, the attacker could theoretically infer the correct API key one character at a time.
+**Prevention:** Use constant-time comparison functions like `secrets.compare_digest()` for comparing sensitive strings, such as passwords, tokens, or API keys. This ensures that the comparison takes the same amount of time regardless of how many characters match, mitigating timing attack vectors.
