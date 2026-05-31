@@ -1,6 +1,7 @@
 """FastAPI delivery layer for the Snowflake Cortex translation service."""
 
 import os
+import secrets
 from collections.abc import Callable
 from importlib.metadata import PackageNotFoundError, version as package_version
 from typing import Protocol
@@ -110,7 +111,7 @@ def build_app(
         """Require a configured API key before cost-bearing translation calls."""
         if not configured_api_key:
             raise ApiNotConfiguredError(API_NOT_CONFIGURED_MESSAGE)
-        if x_api_key != configured_api_key:
+        if not x_api_key or not secrets.compare_digest(x_api_key, configured_api_key):
             raise AuthorizationError(AUTHORIZATION_ERROR_MESSAGE)
 
     @app.exception_handler(RequestValidationError)
