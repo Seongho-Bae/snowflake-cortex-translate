@@ -1,0 +1,3 @@
+## 2026-06-01 - Keyboard Accessibility for Scrollable Regions
+**Learning:** Elements with `overflow-x: auto` (like code blocks or wide tables) require explicit keyboard accessibility support. If they scroll horizontally, keyboard-only users cannot access the off-screen content without a way to focus the container.
+**Action:** Always add `tabindex="0"` to scrollable containers (`<pre>`, `.table-wrap`, etc.) and ensure they have a visible focus indicator (e.g., using `:focus-visible` in CSS).
