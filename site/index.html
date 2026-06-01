@@ -156,7 +156,7 @@
 
         <article>
           <h3>설정 절차</h3>
-          <pre><code>mkdir -p .snowflake
+          <pre tabindex="0"><code>mkdir -p .snowflake
 cp config/connections.toml.example .snowflake/connections.toml
 
 export SNOWFLAKE_HOME="$PWD/.snowflake"
@@ -185,13 +185,13 @@ export SNOWFLAKE_CONNECTION_NAME=dev</code></pre>
 
         <article>
           <h3>의존성 설치</h3>
-          <pre><code>uv sync --dev</code></pre>
+          <pre tabindex="0"><code>uv sync --dev</code></pre>
         </article>
 
         <div class="content-grid code-grid">
           <article>
             <h3>기본 번역</h3>
-            <pre><code>uv run cortex-translate \
+            <pre tabindex="0"><code>uv run cortex-translate \
   --text "Hello world" \
   --source en \
   --target ko</code></pre>
@@ -199,14 +199,14 @@ export SNOWFLAKE_CONNECTION_NAME=dev</code></pre>
 
           <article>
             <h3>원문 언어 자동 감지</h3>
-            <pre><code>uv run cortex-translate \
+            <pre tabindex="0"><code>uv run cortex-translate \
   --text "Voy a likear tus fotos en Insta." \
   --target en</code></pre>
           </article>
 
           <article>
             <h3>추적용 Query Tag 지정</h3>
-            <pre><code>SNOWFLAKE_QUERY_TAG=cortex-translate-demo \
+            <pre tabindex="0"><code>SNOWFLAKE_QUERY_TAG=cortex-translate-demo \
 uv run cortex-translate \
   --text "Good morning" \
   --source en \
@@ -232,13 +232,13 @@ uv run cortex-translate \
 
         <article>
           <h3>로컬 서버 실행</h3>
-          <pre><code>export TRANSLATION_API_KEY=change-me-before-exposing-the-api
+          <pre tabindex="0"><code>export TRANSLATION_API_KEY=change-me-before-exposing-the-api
 uv run uvicorn cortex_translate_service.api:app \
   --host 127.0.0.1 \
   --port 8000</code></pre>
         </article>
 
-        <div class="table-wrap" role="region" aria-labelledby="api-table-title">
+        <div class="table-wrap" role="region" aria-labelledby="api-table-title" tabindex="0">
           <table>
             <caption id="api-table-title">주요 엔드포인트</caption>
             <thead>
@@ -271,12 +271,12 @@ uv run uvicorn cortex_translate_service.api:app \
         <div class="content-grid code-grid">
           <article>
             <h3>헬스 체크</h3>
-            <pre><code>curl http://127.0.0.1:8000/healthz</code></pre>
+            <pre tabindex="0"><code>curl http://127.0.0.1:8000/healthz</code></pre>
           </article>
 
           <article>
             <h3>번역 요청</h3>
-            <pre><code>curl -X POST http://127.0.0.1:8000/api/v1/translations \
+            <pre tabindex="0"><code>curl -X POST http://127.0.0.1:8000/api/v1/translations \
   -H "Content-Type: application/json" \
   -H "x-api-key: $TRANSLATION_API_KEY" \
   -d '{
@@ -310,12 +310,12 @@ uv run uvicorn cortex_translate_service.api:app \
         <div class="content-grid two-column">
           <article>
             <h3>이미지 빌드</h3>
-            <pre><code>docker build -t cortex-translate-service:local .</code></pre>
+            <pre tabindex="0"><code>docker build -t cortex-translate-service:local .</code></pre>
           </article>
 
           <article>
             <h3>컨테이너 실행</h3>
-            <pre><code>docker run --rm -p 8000:8000 \
+            <pre tabindex="0"><code>docker run --rm -p 8000:8000 \
   -v "$PWD/.snowflake:/run/secrets/snowflake:ro" \
   -e SNOWFLAKE_HOME=/run/secrets/snowflake \
   -e SNOWFLAKE_DEFAULT_CONNECTION_NAME=dev \
@@ -354,7 +354,7 @@ uv run uvicorn cortex_translate_service.api:app \
 
           <article>
             <h3>권장 로컬 확인</h3>
-           <pre><code>uv run pytest --cov=src/cortex_translate_service --cov-report=term-missing
+           <pre tabindex="0"><code>uv run pytest --cov=src/cortex_translate_service --cov-report=term-missing
 uv run mypy src tests
 uv run interrogate src tests
 docker build -t cortex-translate-service:local .</code></pre>
