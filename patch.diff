@@ -1,0 +1,18 @@
+--- src/cortex_translate_service/api.py
++++ src/cortex_translate_service/api.py
+@@ -2,6 +2,7 @@
+
+ import os
+ from collections.abc import Callable
++from functools import lru_cache
+ from importlib.metadata import PackageNotFoundError, version as package_version
+ from typing import Protocol
+
+@@ -88,6 +89,7 @@
+         scheme_name="APIKeyHeader",
+     )
+
++    @lru_cache(maxsize=1)
+     def get_service() -> SupportsTranslate:
+         """Provide the translation service dependency."""
+         return service_factory()
